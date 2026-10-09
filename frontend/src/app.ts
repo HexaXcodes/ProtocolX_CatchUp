@@ -1,5 +1,6 @@
 import './style.css';
 import './stitch.css';
+import './cinematic.css';
 import { shell } from './shell';
 import {
   parseChat,
@@ -78,11 +79,11 @@ function updateRoute() {
   showView(currentPath);
 }
 
-function showView(targetPath: string) {
+function showView(targetPath: string, options?: { forceView?: 'import-view' | 'workspace-view' }) {
   let viewName = 'landing-view';
 
   if (targetPath === '/workspace') {
-    viewName = parsed ? 'workspace-view' : 'import-view';
+    viewName = options?.forceView ? options.forceView : (parsed ? 'workspace-view' : 'import-view');
   } else if (targetPath === '/login') {
     viewName = 'login-view';
   } else if (targetPath === '/auth/check-email') {
@@ -105,6 +106,9 @@ function showView(targetPath: string) {
   document.querySelectorAll<HTMLElement>('.page-view').forEach(section => {
     section.hidden = section.id !== viewName;
   });
+  document.body.dataset.view = viewName;
+  window.onmousemove = null;
+  if (viewName !== 'landing-view') el('catchup-intro-overlay').hidden = true;
 
   // Update navbar links active state
   document.querySelectorAll<HTMLAnchorElement>('.nav-link').forEach(link => {
@@ -114,8 +118,10 @@ function showView(targetPath: string) {
     link.setAttribute('aria-current', isActive ? 'page' : 'false');
   });
 
-  // Special view setup
-  if (viewName === 'login-view') {
+  // Special view setup & Landing features
+  if (viewName === 'landing-view') {
+    setupLandingFeatures();
+  } else if (viewName === 'login-view') {
     setupLoginView();
   } else if (viewName === 'check-email-view') {
     setupCheckEmailView();
@@ -126,6 +132,66 @@ function showView(targetPath: string) {
   }
 
   window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+// 1. Landing Features: C Mark Intro, Ticker Toggle, and Pointer Parallax
+function setupLandingFeatures() {
+  const introOverlay = el('catchup-intro-overlay');
+  const skipBtn = el('skip-intro');
+
+  // Check reduced motion preference
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let hasSeenIntro = true;
+  try { hasSeenIntro = sessionStorage.getItem('catchup_intro_seen') === 'true'; } catch { /* Storage may be blocked; skip decoration. */ }
+
+  if (introOverlay) {
+    if (!hasSeenIntro && !prefersReducedMotion && window.location.pathname === '/') {
+      introOverlay.hidden = false;
+      try { sessionStorage.setItem('catchup_intro_seen', 'true'); } catch { /* Nonessential preference. */ }
+
+      const dismissIntro = () => {
+        introOverlay.classList.add('fade-out');
+        setTimeout(() => {
+          introOverlay.hidden = true;
+          introOverlay.classList.remove('fade-out');
+        }, 400);
+      };
+
+      const timerId = setTimeout(dismissIntro, 1800);
+
+      if (skipBtn) {
+        skipBtn.onclick = () => {
+          clearTimeout(timerId);
+          dismissIntro();
+        };
+      }
+    } else {
+      introOverlay.hidden = true;
+    }
+  }
+
+  // Feature Ticker Pause / Resume button
+  const tickerToggleBtn = el('ticker-toggle');
+  const tickerWrapper = document.querySelector('.ticker-ribbon-wrapper');
+  if (tickerToggleBtn && tickerWrapper) {
+    tickerToggleBtn.onclick = () => {
+      const isPaused = tickerWrapper.classList.toggle('paused');
+      const pauseIcon = tickerToggleBtn.querySelector('.pause-icon');
+      if (pauseIcon) pauseIcon.textContent = isPaused ? '▶' : '⏸';
+      tickerToggleBtn.setAttribute('aria-label', isPaused ? 'Resume feature ticker' : 'Pause feature ticker');
+      tickerToggleBtn.setAttribute('aria-pressed', String(isPaused));
+    };
+  }
+
+  // Pointer Parallax (4-8px) on decorative elements
+  const bubbles = document.querySelector<HTMLElement>('.hero-bg-bubbles');
+  if (bubbles && !prefersReducedMotion && !('ontouchstart' in window)) {
+    window.onmousemove = (e: MouseEvent) => {
+      const moveX = (e.clientX / window.innerWidth - 0.5) * 8;
+      const moveY = (e.clientY / window.innerHeight - 0.5) * 8;
+      bubbles.style.transform = `translate(${moveX}px, ${moveY}px)`;
+    };
+  }
 }
 
 function p(text: string, className = '') {
@@ -373,6 +439,7 @@ async function updateSessionState() {
   const scopeBadge = el('workspace-scope-badge');
 
   if (isGuest) {
+    if (userEmailEl) userEmailEl.textContent = '';
     if (guestBadge) guestBadge.hidden = false;
     if (userBadge) userBadge.hidden = true;
     if (authBtn) {
@@ -397,6 +464,14 @@ async function updateSessionState() {
     cancelRun();
     stopModel();
     invalidateImport();
+    // Clear raw text and search fields as well as parsed results on account changes.
+    for (const id of ['chat', 'file', 'since', 'source-search']) {
+      const input = el<HTMLInputElement>(id);
+      if (input) input.value = '';
+    }
+    el('file-name').textContent = '';
+    el('account-email').textContent = '';
+    populateProfileForm({ name: '', role: 'student', interests: [], responsibilities: '', length: 'brief' }, 'account');
     status(isGuest ? 'Signed out. Switched to local guest scope.' : 'Signed in. Loaded account scope.');
   }
 
@@ -406,6 +481,9 @@ async function updateSessionState() {
     populateProfileForm(saved, '');
     if (el<HTMLInputElement>('remember')) el<HTMLInputElement>('remember').checked = true;
   } else {
+    if (oldUserId !== currentUserId) {
+      populateProfileForm({ name: '', role: 'student', interests: [], responsibilities: '', length: 'brief' }, '');
+    }
     if (el<HTMLInputElement>('remember')) el<HTMLInputElement>('remember').checked = false;
   }
 }
@@ -467,6 +545,9 @@ async function setupCallbackView() {
       }
     }, 1500);
   } catch (err) {
+    if (window.location.pathname === '/auth/callback') {
+      window.history.replaceState({}, document.title, '/auth/callback');
+    }
     if (verifyingEl) verifyingEl.hidden = true;
     if (expiredEl) expiredEl.hidden = false;
   }
@@ -607,14 +688,25 @@ function initEventListeners() {
 
   if (el('account-sign-out')) {
     el('account-sign-out').addEventListener('click', async () => {
+      const button = el<HTMLButtonElement>('account-sign-out');
+      button.disabled = true;
+      try {
       fileEpoch++;
       cancelRun();
       stopModel();
       invalidateImport();
-      await signOutUser();
+      for (const id of ['chat', 'file', 'since', 'source-search']) el<HTMLInputElement>(id).value = '';
+      el('file-name').textContent = '';
+      const { error } = await signOutUser();
+      if (error) throw error;
       await updateSessionState();
       navigateTo('/', { replace: true });
       status('Signed out successfully. Session memory cleared.');
+      } catch {
+        status('Chat cleared, but sign-out could not be confirmed. Check your connection and retry.');
+      } finally {
+        button.disabled = false;
+      }
     });
   }
 
@@ -644,19 +736,18 @@ function initEventListeners() {
       const btn = el<HTMLButtonElement>('purge-cache-btn');
       const statusSpan = el('purge-cache-status');
       btn.disabled = true;
+      if (statusSpan) statusSpan.hidden = true;
       try {
-        if ('indexedDB' in window && window.indexedDB.databases) {
-          const dbs = await window.indexedDB.databases();
-          for (const db of dbs) {
-            if (db.name && (db.name.includes('webllm') || db.name.includes('mlc') || db.name.includes('model'))) {
-              window.indexedDB.deleteDatabase(db.name);
-            }
-          }
-        }
+        const modelId = model?.modelId ?? new BrowserModel().modelId;
+        cancelRun();
+        stopModel();
+        controls();
+        const { deleteModelAllInfoInCache } = await import('@mlc-ai/web-llm');
+        await deleteModelAllInfoInCache(modelId);
         if (statusSpan) statusSpan.hidden = false;
-        status('Local model weight cache purged from IndexedDB.');
+        status('Configured model cache cleared. Enable local AI to download it again.');
       } catch {
-        status('Model cache purge request issued.');
+        status('Model cache could not be cleared. No completion has been confirmed; retry or use browser site-storage settings.');
       } finally {
         btn.disabled = false;
       }
@@ -897,8 +988,8 @@ function initEventListeners() {
     });
   }
 
-  if (el('configure')) el('configure').addEventListener('click', () => showView('/workspace'));
-  if (el('edit-profile')) el('edit-profile').addEventListener('click', () => showView('/workspace'));
+  if (el('configure')) el('configure').addEventListener('click', () => showView('/workspace', { forceView: 'import-view' }));
+  if (el('edit-profile')) el('edit-profile').addEventListener('click', () => showView('/workspace', { forceView: 'import-view' }));
   if (el('source-search')) {
     el('source-search').addEventListener('input', () => {
       sourceLimit = 100;
@@ -937,8 +1028,9 @@ async function initApp() {
   initEventListeners();
   await updateSessionState();
 
-  onAuthStateChange(async (_event, _session) => {
-    await updateSessionState();
+  onAuthStateChange(() => {
+    // Defer session reads until the auth callback releases its internal lock.
+    window.setTimeout(() => { void updateSessionState(); }, 0);
   });
 
   updateRoute();

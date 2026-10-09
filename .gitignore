@@ -6,4 +6,4 @@ dist/
 coverage/
 private-data/
 design-reference/
-!prompt.env
+!prompt.md

@@ -17,7 +17,7 @@
 - `vercel.json`: Added `https://*.supabase.co` to Content-Security-Policy `connect-src` directive and added SPA rewrite rule (`/index.html`).
 - `package.json` & `package-lock.json`: Added `@supabase/supabase-js` dependency.
 - `README.md` & `TESTING.md`: Updated architecture documentation, privacy boundaries, token security model, Supabase setup guide, and test records.
-- `prompt.env`: Appended audit prompt entries (`PROMPT_026_USER`, `PROMPT_027_PHASE2_DELIVERY`) documenting user instructions and key decisions.
+- `prompt.md`: Appended audit prompt entries (`PROMPT_026_USER`, `PROMPT_027_PHASE2_DELIVERY`) documenting user instructions and key decisions.
 
 ---
 

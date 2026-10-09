@@ -33,6 +33,21 @@ test('getInitialsFromEmail derives initials correctly', () => {
   assert.equal(getInitialsFromEmail(''), 'GU');
 });
 
+test('browser redirect validation rejects external URLs and strips query credentials', () => {
+  const previous = Object.getOwnPropertyDescriptor(globalThis, 'window');
+  Object.defineProperty(globalThis, 'window', { configurable: true, value: { location: { origin: 'https://catchup.example' } } });
+  try {
+    assert.equal(validateRedirectDestination('https://catchup.example/account?token=private#fragment'), '/account');
+    assert.equal(validateRedirectDestination('//attacker.example/account'), '/workspace');
+    assert.equal(validateRedirectDestination('https://catchup.example.attacker.example/account'), '/workspace');
+    assert.equal(validateRedirectDestination('https://catchup.example@attacker.example/account'), '/workspace');
+    assert.equal(validateRedirectDestination('/unknown'), '/workspace');
+  } finally {
+    if (previous) Object.defineProperty(globalThis, 'window', previous);
+    else Reflect.deleteProperty(globalThis, 'window');
+  }
+});
+
 test('getScopeKey isolates keys for guest vs authenticated users', () => {
   assert.equal(getScopeKey(null), 'catchup.profile.guest');
   assert.equal(getScopeKey(undefined), 'catchup.profile.guest');

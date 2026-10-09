@@ -41,7 +41,7 @@ tests/core.test.ts             17 existing core tests
 tests/fixtures/                explicitly labelled synthetic fixtures
 package.json / package-lock.json / tsconfig.json / vite.config.ts
 vercel.json / render.yaml
-prompt.env                    development prompt log, NOT runtime secrets
+prompt.md                    development prompt log, NOT runtime secrets
 README.md / TESTING.md
 ```
 
@@ -125,4 +125,4 @@ Run build and tests. Test guest import and local inference integration after aut
 
 Read `TESTING.md`: current checks use labelled synthetic fixtures, not real user data. Small-model semantic accuracy is not established. Do not claim this phase solves AI accuracy or every WhatsApp locale. The 3B model completed a source-validated synthetic smoke test, but a real consented export and deployed CSP/network checks remain.
 
-Deliver: changed source files in the existing frontend/backend structure; safe environment template; auth setup checklist with exact redirect URLs to configure once hosts are known; any migrations/policies; tests and actual test output; a short list of external setup still required. Update README and append a concise non-sensitive prompt summary to `prompt.env`. Do not initialize a new unrelated repo, deploy, submit the hackathon entry, or publish credentials.
+Deliver: changed source files in the existing frontend/backend structure; safe environment template; auth setup checklist with exact redirect URLs to configure once hosts are known; any migrations/policies; tests and actual test output; a short list of external setup still required. Update README and append a concise non-sensitive prompt summary to `prompt.md`. Do not initialize a new unrelated repo, deploy, submit the hackathon entry, or publish credentials.

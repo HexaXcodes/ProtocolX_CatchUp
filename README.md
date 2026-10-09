@@ -77,7 +77,7 @@ CatchUp supports managed passwordless email sign-in via Supabase Auth (magic lin
 - **Model Cache**: Model downloads contact external artifact hosts and cache weights in IndexedDB (~420 MB). Model weights remain cached after clearing a chat; they can be purged via the Privacy page.
 - **Clear Session**: Removes chat/results references from the DOM, terminates the AI worker, and nullifies memory addresses. It does not perform physical hardware DRAM shredding or delete the original `.txt` export on disk.
 - **Output Validation**: AI output validation checks structure, known source IDs, and exact deadline excerpts. It does not establish semantic truth; AI output requires human verification against cited sources.
-- **Audit Log**: `prompt.env` is an audit log of prompt history, NOT runtime secrets. It never contains real credentials, tokens, or private chat contents.
+- **Audit Log**: `prompt.md` is an audit log of prompt history, NOT runtime secrets. It never contains real credentials, tokens, or private chat contents.
 
 ---
 

@@ -19,11 +19,47 @@ The Phase 2 Stitch export is integrated into the local CatchUp application. Desi
   - Reduced-motion support: `prefers-reduced-motion` Media Query disables animations and sets smooth scrolling to instant.
   - Desktop and mobile layouts inspected at various viewport widths without document overflow.
 
-## Remaining
+## Visual Refresh Browser Verification Pass (9 October 2026)
 
-- Configured live Supabase Auth project testing with actual SMTP email dispatch. (Unit tests mock configuration states; real magic-link delivery requires an active Supabase project).
-- Real WebGPU hardware model inference on a live consented export. Synthetic fixtures verify code paths and schema validation, not real-world semantic accuracy across all languages or chat styles.
+- **Intro Overlay (`/`)**:
+  - Appears once on the root `/` page when unvisited in the session (`sessionStorage.getItem('catchup_intro_seen')` null).
+  - Custom SVG C mark renders with layered gradient strokes and orbiting amber light particle (`orbitRotate` keyframe).
+  - Keyboard-accessible "Skip intro" button dismisses the overlay immediately (`<button id="skip-intro">`).
+  - Sets `catchup_intro_seen` flag and does not block subsequent visits, direct entries to `/workspace`, `/login`, or other routes.
+- **Continuous Feature Ticker Ribbon**:
+  - All 5 required labels render crisply:
+    1. *AI-powered chat summaries*
+    2. *Source-linked takeaways*
+    3. *On-device chat processing*
+    4. *Role-aware priorities*
+    5. *Actions and decisions at a glance*
+  - Pause/Resume button (`#ticker-toggle`) toggles `.paused` class, button icon (`⏸` / `▶`), and accessible label.
+  - Pauses automatically on `:hover` and `:focus-within` via CSS `animation-play-state: paused`.
+  - Disables marquee animation under `prefers-reduced-motion: reduce`.
+- **Guest Import & Extractive Brief Flow**:
+  - Pasted WhatsApp formatted chat text into `/workspace` and previewed cleanly.
+  - Extractive mode generated brief with source count statistics (*"2 / 2 selected messages analyzed"*).
+  - Expandable source details (`<details>`) and citation locator buttons (`button.citation`) function properly without errors.
+- **Authentication & Route Flows**:
+  - `/login` passwordless magic link form renders cleanly with proper validation.
+  - `/privacy` architectural whitepaper and boundary cards render without defects.
+  - Route guards protect `/account` and redirect unauthenticated visits to `/login`.
+- **Mobile Responsiveness**:
+  - Added `overflow-x: hidden` to `html, body` in `stitch.css`; verified zero page-level horizontal overflow across mobile viewports (375px/390px).
+- **Console & Network Inspection**:
+  - Zero console errors or runtime warnings.
+  - Zero external CDN or Google Font requests.
+- **Font Bundling Audit**:
+  - **Status: NOT locally bundled.** The repository does not include local `.woff2` or `.ttf` files for *Outfit* or *Plus Jakarta Sans*, nor any `@font-face` definitions.
+  - The CSS `font-family: Outfit, 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;` falls back reliably to high-quality OS system fonts (`system-ui` / `Segoe UI` on Windows, `-apple-system` on macOS) with zero external network leakage.
 
 ## Reproduce
 
 Run `npm test`, `npm run build`, and `npm run dev` from the repository root. Never include real chat data or private credentials in test files or audit logs.
+# Codex final bounded verification — 2026-10-09
+
+- Production build and TypeScript: passed. Vite still warns about the optional large WebLLM chunks.
+- Unit tests: 23 passed, including browser-origin redirect regression cases.
+- Git whitespace check: passed, apart from informational LF/CRLF warnings.
+- Browser: inspected cinematic landing and 390px mobile workspace; exercised plain-text import, extractive results and clearing the session with disposable test-only input.
+- Not exercised in this pass: live email authentication, authenticated account switching, AI model download/inference, cache removal or production CSP. Do not treat passing unit tests as verification of these flows.

@@ -1,11 +1,57 @@
+import { landing } from './landing';
 // Static application markup for CatchUp Phase 2.
 // All user and chat content is strictly rendered as text via DOM nodes.
 
 export const shell = `
+<div id="catchup-intro-overlay" class="intro-overlay" hidden>
+  <div class="intro-content">
+    <div class="intro-c-container">
+      <svg class="intro-c-svg" viewBox="0 0 100 100" aria-hidden="true">
+        <defs>
+          <linearGradient id="c-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#E2ECE7" />
+            <stop offset="40%" stop-color="#128C7E" />
+            <stop offset="100%" stop-color="#075E54" />
+          </linearGradient>
+          <linearGradient id="orbit-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#F59E0B" stop-opacity="1" />
+            <stop offset="100%" stop-color="#D97706" stop-opacity="0" />
+          </linearGradient>
+          <filter id="c-glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          </filter>
+        </defs>
+        <!-- Custom C mark stroke -->
+        <path class="c-path" d="M 68 28 A 34 34 0 1 0 68 72" fill="none" stroke="url(#c-grad)" stroke-width="12" stroke-linecap="round" filter="url(#c-glow)" />
+        <!-- Orbiting amber light particle -->
+        <g class="orbit-group">
+          <circle cx="50" cy="50" r="34" fill="none" class="orbit-path-debug" />
+          <circle class="amber-light" cx="68" cy="28" r="4" fill="#F59E0B" />
+        </g>
+      </svg>
+      <div class="intro-bloom"></div>
+    </div>
+    <div class="intro-brand-name">CatchUp</div>
+    <button id="skip-intro" class="skip-intro-btn" aria-label="Skip intro animation">Skip intro</button>
+  </div>
+</div>
+
 <header class="topbar">
   <div class="topbar-left">
     <a class="brand" href="/" data-route="/" aria-label="CatchUp home">
-      <span class="brand-icon">✓</span> CatchUp<span class="brand-dot">•</span>
+      <svg class="brand-svg-logo" viewBox="0 0 32 32" width="28" height="28" aria-hidden="true">
+        <defs>
+          <linearGradient id="brand-c-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#128C7E" />
+            <stop offset="100%" stop-color="#075E54" />
+          </linearGradient>
+        </defs>
+        <rect width="32" height="32" rx="8" fill="#075E54" />
+        <path d="M 22 10 A 10 10 0 1 0 22 22" fill="none" stroke="#E2ECE7" stroke-width="3.5" stroke-linecap="round" />
+        <circle cx="22" cy="10" r="1.8" fill="#F59E0B" />
+      </svg>
+      CatchUp<span class="brand-dot">•</span>
     </a>
     <div class="tagline">Back in the loop.<br><span>On your terms.</span></div>
   </div>
@@ -45,185 +91,7 @@ export const shell = `
     <strong>Session expired:</strong> Inactive session token expired. Current in-memory chat buffers have been cleared for privacy protection.
   </div>
 
-  <!-- 1. LANDING PAGE VIEW -->
-  <section id="landing-view" class="page-view" hidden>
-    <div class="hero-section">
-      <div class="hero-badge">
-        <span class="badge-dot"></span>
-        <span>Zero-Cloud Local Synthesis</span>
-      </div>
-      <h1>Back in the loop. <span class="highlight">On your terms.</span></h1>
-      <p class="hero-lead">
-        Find the decisions, requests, and updates that matter to you—without uploading your chats.
-      </p>
-
-      <div class="hero-actions">
-        <a href="/workspace" data-route="/workspace" class="btn primary">Start catching up →</a>
-        <a href="/workspace" data-route="/workspace" class="btn secondary">Continue locally without an account</a>
-      </div>
-      <p class="hero-footnote">
-        An optional account syncs your saved identity and role preferences. Guest mode works immediately—in both modes, chat processing happens 100% locally in your browser.
-      </p>
-      
-      <div class="hero-features-list">
-        <span>✓ WebGPU On-Device</span>
-        <span>• RAM-only Processing</span>
-        <span>• Zero Chat Data Transmitted</span>
-      </div>
-    </div>
-
-    <!-- Transformation Diagram -->
-    <div class="transformation-card">
-      <div class="card-header">
-        <span class="eyebrow">STRUCTURAL DATA TRANSFORMATION</span>
-        <span class="badge">Local Sandbox</span>
-      </div>
-      <div class="input-preview">
-        <strong>Import: Project-Sync.txt</strong> (142 msgs)
-        <p class="italic">"[14:32] Sarah: Hey team, @Alex please merge the checkout hotfix before 5 PM deploy."</p>
-      </div>
-      <div class="flow-arrow">↓</div>
-      <div class="brief-preview">
-        <div class="brief-item-header">
-          <span class="badge priority">HIGH PRIORITY</span>
-          <strong>Assigned to: Alex</strong>
-        </div>
-        <p>Merge checkout hotfix prior to the 5:00 PM production deployment cycle.</p>
-        <div class="citation-preview font-mono">
-          <span>[MSG-042] Verified citation at 14:32</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- 3-Step Process -->
-    <div class="section-block">
-      <span class="eyebrow">PROCESS ARCHITECTURE</span>
-      <h2>Three steps from notification overload to clear next actions</h2>
-      <div class="three-step-grid">
-        <div class="step-card">
-          <div class="step-num">01</div>
-          <h3>Import a text export</h3>
-          <p>Drop or paste an unencrypted WhatsApp export (.txt). CatchUp inspects plain text structures only—no photos, voice notes, or media files required.</p>
-        </div>
-        <div class="step-card">
-          <div class="step-num">02</div>
-          <h3>Choose your context</h3>
-          <p>Select your display name and role (Student, Developer, Project Lead, or Custom) to recalibrate relevance scoring and eliminate irrelevant team chatter.</p>
-        </div>
-        <div class="step-card">
-          <div class="step-num">03</div>
-          <h3>Read and verify your brief</h3>
-          <p>Review urgent actions, consensus decisions, and team commitments. Inspect exact cited WhatsApp messages with inline source verification.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- 3 Differentiators -->
-    <div class="section-block">
-      <span class="eyebrow">GUIDING PRINCIPLES</span>
-      <h2>Engineered for precision over generic summaries</h2>
-      <div class="three-card-grid">
-        <div class="feature-card">
-          <h3>Relevant to your role</h3>
-          <p>Avoid 10-page generic recaps. CatchUp highlights items specifically requiring your direct action, decisions affecting your workstream, and blockers raised in your domain.</p>
-        </div>
-        <div class="feature-card">
-          <h3>Sources behind each takeaway</h3>
-          <p>Every synthesized bullet point links directly to its source message timestamp and sender handle. Never second-guess if the model invented a deadline.</p>
-        </div>
-        <div class="feature-card">
-          <h3>On-device processing</h3>
-          <p>Powered by WebGPU client-side inference or our instant deterministic heuristic parser. Your chats are never transmitted across the network, logged, or retained.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Role Customization Examples -->
-    <div class="section-block">
-      <span class="eyebrow">CONTEXT FILTERS</span>
-      <h2>Tailor summaries to what you actually do</h2>
-      <div class="four-role-grid">
-        <div class="role-card">
-          <h4>Student</h4>
-          <p>Prioritizes assignment deadlines, study group locations, syllabus modifications, and direct course questions.</p>
-          <span class="badge">Deadlines • Homework</span>
-        </div>
-        <div class="role-card">
-          <h4>Developer</h4>
-          <p>Prioritizes pull request reviews, staging breaks, architectural decisions, API breaking changes, and on-call alerts.</p>
-          <span class="badge">PRs • Regressions • Blockers</span>
-        </div>
-        <div class="role-card">
-          <h4>Project Lead</h4>
-          <p>Prioritizes deliverable sign-offs, cross-functional dependencies, milestone dates, and operational risk escalations.</p>
-          <span class="badge">Deliverables • Risks</span>
-        </div>
-        <div class="role-card">
-          <h4>Custom</h4>
-          <p>Define your own trigger keywords, priority topics, and notification tiers tailored for community or family chats.</p>
-          <span class="badge">Custom keywords</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Data Boundary -->
-    <div class="section-block boundary-box">
-      <span class="eyebrow">PRIVACY ARCHITECTURE</span>
-      <h2>Transparent data boundary. No backdoors.</h2>
-      <div class="two-col-grid">
-        <div class="boundary-card over-wire">
-          <h3>Downloaded from CDN</h3>
-          <ul>
-            <li>✓ Web application code, HTML, CSS, and interactive UI logic.</li>
-            <li>✓ Open-source WebGPU model weights (cached in browser IndexedDB).</li>
-            <li>✓ Optional authentication tokens if you choose to create a profile.</li>
-          </ul>
-        </div>
-        <div class="boundary-card on-device">
-          <h3>Never Leaves Device RAM</h3>
-          <ul>
-            <li>🔒 Exported WhatsApp text files (.txt) and parsed conversation logs.</li>
-            <li>🔒 Sender names, timestamps, contact identities, and phone numbers.</li>
-            <li>🔒 Generated summaries, bulleted digests, and cited message fragments.</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- FAQ -->
-    <div class="section-block">
-      <span class="eyebrow">FREQUENTLY ANSWERED</span>
-      <h2>Direct answers to honest questions</h2>
-      <div class="faq-grid">
-        <div class="faq-card">
-          <h4>Does it connect to WhatsApp?</h4>
-          <p>No. CatchUp operates exclusively on exported plain-text files (.txt). It has no API connection to WhatsApp, Meta, or any third-party messaging server.</p>
-        </div>
-        <div class="faq-card">
-          <h4>Do I need an account?</h4>
-          <p>No. You can use full guest mode immediately without providing an email address. Creating an account only saves your role preferences across sessions.</p>
-        </div>
-        <div class="faq-card">
-          <h4>Does the AI always get it right?</h4>
-          <p>No. Summarization models can misinterpret nuance or shorthand. That is why every single takeaway includes an interactive citation to verify against the original message.</p>
-        </div>
-        <div class="faq-card">
-          <h4>What if my device cannot run AI?</h4>
-          <p>CatchUp includes a zero-download Extractive Mode that uses deterministic keyword matching and role filters with zero neural network overhead.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Landing Footer CTA -->
-    <div class="cta-box">
-      <h2>Clear your notification backlog in seconds</h2>
-      <p>Start reviewing actionable takeaways today. Completely free, confidential, and run locally inside your browser.</p>
-      <div class="hero-actions">
-        <a href="/workspace" data-route="/workspace" class="btn primary">Start catching up</a>
-        <a href="/workspace" data-route="/workspace" class="btn secondary">Continue as Guest</a>
-      </div>
-    </div>
-  </section>
+  ${landing}
 
   <!-- 2. SIGN-IN PAGE VIEW (/login) -->
   <section id="login-view" class="page-view" hidden>
@@ -231,11 +99,11 @@ export const shell = `
       <div class="auth-header">
         <span class="badge">Local-First Authentication</span>
         <h2>Sign in to CatchUp</h2>
-        <p>Distill your chat streams with complete data sovereignty. Passwordless email link only.</p>
+        <p>Your next catch-up starts here. Sign in with a secure email link, or continue as a guest.</p>
       </div>
 
       <div id="login-unconfigured-banner" class="notice error-notice" hidden>
-        <strong>Sign-in is not configured:</strong> Outbound authentication service is pending environment variables (<code>VITE_SUPABASE_URL</code>). Local guest mode is fully functional without an account.
+        <strong>Sign-in is not configured:</strong> You can still use the local guest workspace without an account.
       </div>
 
       <div id="login-cooldown-banner" class="notice warning" hidden>
@@ -262,7 +130,7 @@ export const shell = `
       </button>
 
       <div class="auth-footnote">
-        Accounts only store display name and role settings. Chat processing always stays strictly on your local hardware.
+        Supabase handles your email and sign-in session. Role preferences stay on this device. Your chats are processed in your browser.
       </div>
     </div>
   </section>
@@ -390,7 +258,7 @@ export const shell = `
     <div class="page-heading">
       <div>
         <span class="eyebrow">YOUR CONTEXT. YOUR PRIORITIES.</span>
-        <h1>Import & configuration</h1>
+        <h1>Make room for what matters.</h1>
         <p>Bring a conversation. Leave the noise behind.</p>
       </div>
       <span id="workspace-scope-badge" class="badge">◈ Local profile · Guest Mode</span>
@@ -596,9 +464,9 @@ export const shell = `
       <div>
         <span class="eyebrow">PRIVACY & DATA FLOW ARCHITECTURE</span>
         <h1>Your conversation stays on this device.</h1>
-        <p>A transparent technical whitepaper of what is stored, processed, and downloaded.</p>
+        <p>What stays here, what gets stored, and what connects to the internet.</p>
       </div>
-      <span class="badge">Zero Egress Verification</span>
+      <span class="badge">On-device chat processing</span>
     </div>
 
     <div class="privacy-whitepaper">
@@ -607,7 +475,7 @@ export const shell = `
           <span class="step-num">01</span>
           <h2>Chat Text & Parsed Summaries</h2>
           <p class="badge warning">Ephemeral RAM Isolation</p>
-          <p>Imported messages and generated results are held strictly in browser Web Worker memory heap. Parsing, ranking, and AI inference execute locally on your hardware.</p>
+          <p>Imported messages and results are held in browser memory and displayed on this page. Parsing and ranking run locally; local AI runs in a browser worker.</p>
           <p>They are never written to persistent cookies, <code>localStorage</code>, or transmitted across network sockets.</p>
         </article>
 
@@ -623,7 +491,7 @@ export const shell = `
           <span class="step-num">03</span>
           <h2>Identity & Managed Authentication</h2>
           <p class="badge">Isolated Auth Provider</p>
-          <p>Passwordless email magic-link sign-in verifies your identity. The authentication service receives your email address only; it has zero access to your imported chats, summaries, or local profile parameters.</p>
+          <p>Supabase handles your email, authentication requests, and session tokens. CatchUp does not send imported chats, summaries, or role preferences to the authentication service.</p>
         </article>
 
         <article class="panel">
@@ -650,7 +518,7 @@ export const shell = `
             <ul>
               <li>Does NOT perform physical hardware DRAM cryptographic shredding (browser JS cannot bypass OS memory controls).</li>
               <li>Does NOT delete your original <code>.txt</code> export file on your disk.</li>
-              <li>Does NOT automatically delete cached model weights (~420 MB in IndexedDB).</li>
+              <li>Does NOT automatically delete downloaded model files from browser storage.</li>
             </ul>
           </div>
         </div>
