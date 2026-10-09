@@ -1,0 +1,5 @@
+09/10/2026, 10:00 - Test Coordinator: SYNTHETIC TEST FIXTURE — not real user data.
+09/10/2026, 10:01 - Ben: Ana, please review the API bug by Friday.
+09/10/2026, 10:02 - Ana: I will investigate; no deployment agreed yet.
+09/10/2026, 10:03 - Ben: Exam registration closes Monday.
+09/10/2026, 10:04 - Ana: <img src=x onerror=alert(1)>

@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: catchup-metadata
+    runtime: node
+    buildCommand: echo "No server dependencies required"
+    startCommand: node backend/server/health.mjs
+    healthCheckPath: /health
