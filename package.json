@@ -4,12 +4,20 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --host 127.0.0.1",
+    "dev": "vite --host localhost --port 5173",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview --host 127.0.0.1",
+    "preview": "vite preview --host localhost --port 5173",
     "test": "tsx --test tests/*.test.ts",
     "start": "node backend/server/health.mjs"
   },
-  "dependencies": { "@mlc-ai/web-llm": "^0.2.85" },
-  "devDependencies": { "typescript": "^5.9.3", "vite": "^7.1.12", "tsx": "^4.20.6", "@types/node": "^24.0.0" }
+  "dependencies": {
+    "@mlc-ai/web-llm": "^0.2.85",
+    "@supabase/supabase-js": "^2.117.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.12"
+  }
 }
